@@ -7,11 +7,26 @@ class Games:
 
         self._games = []
         self._text = text
+        self._result_matrix = np.matrix([[]])
+        self._total_matrix = np.matrix([[]])
 
     def divide_games(self):
         games = self._text.split("match id")
         for i in range(1, len(games)):
             self._games.append(Game(games[i], self._labels))
+
+    def create_total_matrices(self):
+        self._total_matrix = self._games[0].matrix_row
+        self._result_matrix = self._games[0].result
+        for i in range(1, len(self._games)):
+            self._total_matrix = np.vstack([self._total_matrix, self._games[i].matrix_row])
+            self._result_matrix = np.vstack([self._result_matrix, self._games[i].result])
+
+    def total_matrix(self):
+        return self._total_matrix
+
+    def result_matrix(self):
+        return self._result_matrix
 
 
 class Game:
@@ -54,3 +69,4 @@ f = open("data//games.txt", "r")
 text = f.read()
 b = Games(text)
 b.divide_games()
+b.create_total_matrices()
