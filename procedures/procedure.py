@@ -19,19 +19,26 @@ class ForwardProp(Procedure):
         super().__init__(neural_net)
 
     def step(self, action):
-        for i in range(1, self.neural_net):
-            pass
+        for i in range(len(self.neural_net.layer), 1, -1):
+            # TODO: Need to add in the next layer
+            self.neural_net.stack.push(Sigmoid(self.neural_net, self.neural_net.layer[i]))
 
 
 class Sigmoid(Procedure):
-    def __init__(self, neural_net):
+    def __init__(self, neural_net, layer):
         super().__init__(neural_net)
+        self.layer = layer
 
     def step(self, action):
-        pass
+        self.layer.next_step()
 
 
 class BackwardProp(Procedure):
     def __init__(self, neural_net):
         super().__init__(neural_net)
+
+
+
+
+
 

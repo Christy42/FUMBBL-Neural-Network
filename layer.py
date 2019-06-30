@@ -7,6 +7,7 @@ from add_bias import add_bias
 
 class Layer:
     def __init__(self, nodes, style, input_no, input_data=False):
+        self.stack = Stack()
         self._style = style
         self._no_nodes = nodes
         self._nodes = input_data if input_data else np.matrix([])
@@ -37,3 +38,27 @@ class NeuralNet:
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, input_nodes)] + \
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes)]
+
+    @property
+    def layers(self):
+        return self._layers
+
+
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def is_empty(self):
+        return self.items == []
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        return self.items.pop()
+
+    def peek(self):
+        return self.items[len(self.items)-1]
+
+    def size(self):
+        return len(self.items)
