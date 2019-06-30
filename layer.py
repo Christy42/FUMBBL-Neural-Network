@@ -1,12 +1,14 @@
 import numpy as np
 
+from enum_values import LayerTypes
+
 
 class Layer:
     def __init__(self, nodes, style, input_no):
         self._style = style
         self._nodes = [0] * nodes
         self._input_no = input_no
-        if style != "input":
+        if style != LayerTypes.INPUT:
             self._theta = self._initialise_matrix(0.01)
         else:
             self._theta = np.matrix([[]])
@@ -17,5 +19,7 @@ class Layer:
 
 class NeuralNet:
     def __init__(self, hidden_layers, input_nodes, output_nodes, hidden_nodes):
-        self._layers = [Layer(input_nodes, "input", 0)] + [Layer(hidden_nodes, "hidden", input_nodes)] * hidden_layers + \
-                       [Layer(output_nodes, "output", hidden_nodes)]
+        self._layers = [Layer(input_nodes, LayerTypes.INPUT, 0)] + \
+                       [Layer(hidden_nodes, LayerTypes.HIDDEN, input_nodes)] + \
+                       [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
+                       [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes)]
