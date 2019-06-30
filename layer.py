@@ -2,9 +2,9 @@ import numpy as np
 
 from enum_values import LayerTypes
 from forward_prop import sigmoid
+from add_bias import add_bias
 
 
-# TODO: Add bias (which point exactly? Do I have the write number of nodes)
 class Layer:
     def __init__(self, nodes, style, input_no, input_data=False):
         self._style = style
@@ -21,10 +21,11 @@ class Layer:
         return self._nodes
 
     def _initialise_matrix(self, epsilon):
-        return (np.random.rand(self._input_no, self._no_nodes) - 0.5) * epsilon * 2
+        return (np.random.rand(self._input_no+1, self._no_nodes) - 0.5) * epsilon * 2
 
     def next_step(self, x):
-        self._nodes = sigmoid(x * self._theta)
+        x_bias = add_bias(x)
+        self._nodes = sigmoid(x_bias * self._theta)
 
     def update_theta(self):
         pass
