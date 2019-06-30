@@ -31,6 +31,9 @@ class Layer:
     def update_theta(self):
         pass
 
+    def set_theta(self, new_value):
+        self._theta = new_value
+
 
 class NeuralNet:
     def __init__(self, hidden_layers, input_nodes, output_nodes, hidden_nodes, input_data):
@@ -38,11 +41,35 @@ class NeuralNet:
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, input_nodes)] + \
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes)]
+        self._input_data = input_data
 
     @property
     def layers(self):
         return self._layers
 
+    def set_layer(self, layer, theta):
+        self._layers[layer].set_theta(theta)
+
+    # TODO: Actually do this part
+    def step(self):
+        """
+        Runs the match by taking from the stack
+        :return:
+        """
+        EndGameProc(self)
+        PreGameProc(self)
+
+        while True:
+            # Check if the game is over
+            if self.state.is_empty:
+                return {self.state.player_1.id: self.state.player_2.state.games_won_in_match,
+                        self.state.player_2.id: self.state.player_2.state.games_won_in_match}
+
+            # Check the next item on the stack and run it.
+            proc = self.state.peek
+            # Do action
+            self.state.pop()
+            proc.step()
 
 class Stack:
     def __init__(self):
