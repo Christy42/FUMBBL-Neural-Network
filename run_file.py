@@ -1,6 +1,7 @@
 import numpy as np
 
 from layer import NeuralNet
+from procedures.procedure import ForwardProp
 # Create data
 X = np.matrix([[1, 2], [3, 4]])
 # Create Neural Net
@@ -13,4 +14,8 @@ N.set_layer(2, Theta_2)
 N.set_layer(3, Theta_3)
 # Add Roll Forward to the Stack
 
+roll_forward = ForwardProp(N)
+N.stack.push(roll_forward)
+
 # Run through the stack - this functionality needs some work
+N.step()

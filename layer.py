@@ -3,11 +3,11 @@ import numpy as np
 from enum_values import LayerTypes
 from forward_prop import sigmoid
 from add_bias import add_bias
+from stack import Stack
 
 
 class Layer:
     def __init__(self, nodes, style, input_no, input_data=False):
-        self.stack = Stack()
         self._style = style
         self._no_nodes = nodes
         self._nodes = input_data if input_data else np.matrix([])
@@ -42,6 +42,7 @@ class NeuralNet:
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes)]
         self._input_data = input_data
+        self.stack = Stack()
 
     @property
     def layers(self):
@@ -50,42 +51,26 @@ class NeuralNet:
     def set_layer(self, layer, theta):
         self._layers[layer].set_theta(theta)
 
+    #TODO: This needs to be some sort of class to get pushed
+    def sigmoid_layer(self, layer):
+        self._layers[layer].next_step(self._layers[layer-1].nodes if i > 0 else self._input_data)
+        self.stack.push()
+
     # TODO: Actually do this part
     def step(self):
         """
         Runs the match by taking from the stack
         :return:
         """
-        EndGameProc(self)
-        PreGameProc(self)
 
         while True:
-            # Check if the game is over
-            if self.state.is_empty:
-                return {self.state.player_1.id: self.state.player_2.state.games_won_in_match,
-                        self.state.player_2.id: self.state.player_2.state.games_won_in_match}
+            # Check if the process is over
+            if self.stack.is_empty:
+                # TODO: Probably should return something at the end
+                return 1
 
             # Check the next item on the stack and run it.
-            proc = self.state.peek
+            proc = self.stack.peek
             # Do action
-            self.state.pop()
+            self.stack.pop()
             proc.step()
-
-class Stack:
-    def __init__(self):
-        self.items = []
-
-    def is_empty(self):
-        return self.items == []
-
-    def push(self, item):
-        self.items.append(item)
-
-    def pop(self):
-        return self.items.pop()
-
-    def peek(self):
-        return self.items[len(self.items)-1]
-
-    def size(self):
-        return len(self.items)
