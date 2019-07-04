@@ -1,5 +1,6 @@
 import numpy as np
 
+from procedures.procedure import Procedure
 import add_bias
 
 

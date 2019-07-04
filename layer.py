@@ -10,7 +10,7 @@ class Layer:
     def __init__(self, nodes, style, input_no, input_data=False):
         self._style = style
         self._no_nodes = nodes
-        self._nodes = input_data if input_data else np.matrix([])
+        self._nodes = input_data if input_data is not False else np.matrix([])
         self._input_no = input_no
         if style != LayerTypes.INPUT:
             self._theta = self._initialise_matrix(0.01)
@@ -37,7 +37,7 @@ class Layer:
 
 class NeuralNet:
     def __init__(self, hidden_layers, input_nodes, output_nodes, hidden_nodes, input_data):
-        self._layers = [Layer(input_nodes, LayerTypes.INPUT, 0)] + \
+        self._layers = [Layer(input_nodes, LayerTypes.INPUT, 0, input_data=input_data)] + \
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, input_nodes)] + \
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes)]
@@ -51,10 +51,9 @@ class NeuralNet:
     def set_layer(self, layer, theta):
         self._layers[layer].set_theta(theta)
 
-    #TODO: This needs to be some sort of class to get pushed
+    # TODO: This needs to be some sort of class to get pushed
     def sigmoid_layer(self, layer):
-        self._layers[layer].next_step(self._layers[layer-1].nodes if i > 0 else self._input_data)
-        self.stack.push()
+        self._layers[layer].next_step(self._layers[layer-1].nodes if layer > 0 else self._input_data)
 
     # TODO: Actually do this part
     def step(self):
@@ -73,4 +72,4 @@ class NeuralNet:
             proc = self.stack.peek
             # Do action
             self.stack.pop()
-            proc.step()
+            proc.step(1)
