@@ -7,15 +7,13 @@ from stack import Stack
 
 
 class Layer:
-    def __init__(self, nodes, style, input_no, input_data=False):
+    def __init__(self, nodes, style, input_no, input_data=False, output_data=False):
         self._style = style
         self._no_nodes = nodes
         self._nodes = input_data if input_data is not False else np.matrix([])
+        self._output_data = output_data if output_data is not False else np.matrix([])
         self._input_no = input_no
-        if style != LayerTypes.INPUT:
-            self._theta = self._initialise_matrix(0.01)
-        else:
-            self._theta = np.matrix([[]])
+        self._theta = np.matrix([[]]) if style == LayerTypes.INPUT else self._initialise_matrix(0.01)
 
     @property
     def nodes(self):
@@ -31,16 +29,19 @@ class Layer:
     def update_theta(self):
         pass
 
+    def prev_step(self):
+        pass
+
     def set_theta(self, new_value):
         self._theta = new_value
 
 
 class NeuralNet:
-    def __init__(self, hidden_layers, input_nodes, output_nodes, hidden_nodes, input_data):
+    def __init__(self, hidden_layers, input_nodes, output_nodes, hidden_nodes, input_data, output_data):
         self._layers = [Layer(input_nodes, LayerTypes.INPUT, 0, input_data=input_data)] + \
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, input_nodes)] + \
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
-                       [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes)]
+                       [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes, output_data=output_data)]
         self._input_data = input_data
         self.stack = Stack()
 
@@ -54,6 +55,9 @@ class NeuralNet:
     # TODO: This needs to be some sort of class to get pushed
     def sigmoid_layer(self, layer):
         self._layers[layer].next_step(self._layers[layer-1].nodes if layer > 0 else self._input_data)
+
+    def back_prop_step(self, layer):
+        self._layers[layer].prev_step()
 
     # TODO: Actually do this part
     def step(self):
