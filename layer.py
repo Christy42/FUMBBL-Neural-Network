@@ -25,6 +25,8 @@ class Layer:
     def next_step(self, x):
         x_bias = add_bias(x)
         self._nodes = sigmoid(x_bias * self._theta)
+        print("XXXXX")
+        print(self._nodes)
 
     def update_theta(self):
         pass
@@ -43,11 +45,16 @@ class NeuralNet:
                        [Layer(hidden_nodes, LayerTypes.HIDDEN, hidden_nodes)] * (hidden_layers - 1) + \
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes, output_data=output_data)]
         self._input_data = input_data
+        self._outpu_data = output_data
         self.stack = Stack()
 
     @property
     def layers(self):
         return self._layers
+
+    @property
+    def output_data(self):
+        return self._outpu_data
 
     def set_layer(self, layer, theta):
         self._layers[layer].set_theta(theta)
@@ -57,7 +64,12 @@ class NeuralNet:
         self._layers[layer].next_step(self._layers[layer-1].nodes if layer > 0 else self._input_data)
 
     def back_prop_step(self, layer):
+        print(layer)
         self._layers[layer].prev_step()
+
+    @property
+    def size(self):
+        return len(self.layers)
 
     # TODO: Actually do this part
     def step(self):

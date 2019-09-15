@@ -1,3 +1,5 @@
+import numpy as np
+
 
 class Procedure:
 
@@ -19,7 +21,7 @@ class ForwardProp(Procedure):
         super().__init__(neural_net)
 
     def step(self, action):
-        for i in range(len(self.neural_net.layers)-1, 0, -1):
+        for i in range(len(self.neural_net.layers)-2, 0, -1):
             self.neural_net.stack.push(Sigmoid(self.neural_net, i))
 
 
@@ -40,12 +42,23 @@ class Delta(Procedure):
     def step(self, action):
         self.neural_net.back_prop_step(self.layer)
 
+
 class BackwardProp(Procedure):
     def __init__(self, neural_net):
         super().__init__(neural_net)
 
     def step(self, action):
-        for i in range(2, len(self.neural_net)+1):
+        for i in range(2, self.neural_net.size):
             self.neural_net.stack.push(Delta(self.neural_net, i))
 
 
+class Cost(Procedure):
+    def __init__(self, neural_net):
+        super().__init__(neural_net)
+
+    def step(self, action):
+        # TODO:  Get this cost function as the output from the last layer and the nodes from the second last?
+        value = np.multiply(self.neural_net.output_data, np.log(self.neural_net.layers[-2].nodes)) + \
+                np.multiply(1-self.neural_net.output_data, np.log(1-self.neural_net.layers[-2].nodes))
+        print(-np.sum(value) / np.size(value, 0))
+        pass
