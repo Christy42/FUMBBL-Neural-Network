@@ -1,12 +1,13 @@
 import numpy as np
 
 from layer import NeuralNet
+from numerical_check import numeric
 from procedures.procedure import ForwardProp, BackwardProp, Cost
 # Create data
 X = np.matrix([[0.5403, -0.4161], [-0.99, -0.6536], [0.2837, 0.9602]])
 # Create Neural Net
 output = np.matrix([[0, 0, 0, 1], [0, 1, 0, 0], [0, 0, 1, 0]])
-N = NeuralNet(hidden_layers=2, input_nodes=2, output_nodes=3, hidden_nodes=2, input_data=X, output_data=output)
+N = NeuralNet(hidden_layers=2, input_nodes=2, output_nodes=4, hidden_nodes=2, input_data=X, output_data=output)
 # Theta_1 = np.matrix([[1, 4, 5, 6], [2, 3, 4, 1], [1, 2, 3, 4]])
 Theta_1 = np.matrix([[0.1, 0.2], [0.3, 0.4], [0.5, 0.6]])
 # Theta_2 = np.matrix([[1, 2, 1, 3], [2, 1, 3, 1], [1, 4, 1, 2], [1, 2, 1, 2], [3, 1, 1, 1]])
@@ -19,16 +20,17 @@ N.set_layer(2, Theta_2)
 # Add Roll Forward to the Stack
 
 # final = Cost(N)
-back_prop = BackwardProp(N)
-roll_forward = ForwardProp(N)
+# back_prop = BackwardProp(N)
+# roll_forward = ForwardProp(N)
 
 
 # Run through the stack - this functionality needs some work
-N.step()
+# N.step()
+numeric(N, 0.001)
 
-print(N.layers[-2].nodes)
-for i in range(N.size):
-   print(i)
-   print(N.layers[i].nodes)
-   print(N.layers[i].theta)
+#print(N.layers[-2].nodes)
+#for i in range(N.size):
+#   print(i)
+#   print(N.layers[i].nodes)
+#   print(N.layers[i].theta)
 

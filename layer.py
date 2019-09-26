@@ -13,7 +13,9 @@ class Layer:
         self._nodes = input_data if input_data is not False else np.matrix([])
         self._output_data = output_data if output_data is not False else np.matrix([])
         self._input_no = input_no
+        self._input_bias = np.matrix([[]])
         self._error = np.matrix([0] * self._no_nodes)
+        self._delta = self._error
         self._theta = np.matrix([[]]) if style == LayerTypes.INPUT else self._initialise_matrix(0.01)
 
     @property
@@ -24,21 +26,15 @@ class Layer:
     def error(self):
         return self._error
 
-    def calc_error(self, data):
+    def calc_error(self, data, follow_theta=False):
         if self._style == LayerTypes.OUTPUT:
-            print(data)
-            print("X")
-            print(self.nodes)
             self._error = self._nodes - data
         else:
-            print("DAJFKASLFJSDAFKD")
-            print(self.theta)
-            print(np.transpose(data))
-            print("GGGGGGGGGGGGGGGGGGGGGGGGGGG")
-            print(np.transpose(data) * self._theta)
-            print(np.multiply(self._nodes, 1 - self._nodes))
-            self._error = np.multiply(np.transpose(data) * self._theta, np.multiply(self._nodes, 1 - self._nodes))
-            print(self._error)
+            print(data * np.transpose(follow_theta))
+            print(self._input_bias)
+            self._delta = np.multiply(data * np.transpose(follow_theta), np.multiply(self._input_bias, 1 - self._input_bias))
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        print(self._delta)
 
     def update(self):
         self._theta += self._error
@@ -47,14 +43,19 @@ class Layer:
     def theta(self):
         return self._theta
 
+    def amend_theta(self, i, j, epsilon):
+        self._theta[i, j] += epsilon
+
     def _initialise_matrix(self, epsilon):
         return (np.random.rand(self._input_no+1, self._no_nodes) - 0.5) * epsilon * 2
 
     def next_step(self, x):
-        x_bias = add_bias(x)
-        self._nodes = sigmoid(x_bias * self._theta)
-        print("XXXXX")
-        print(self._nodes)
+        self._input_bias = add_bias(x)
+        self._nodes = sigmoid(self._input_bias * self._theta)
+
+    @property
+    def theta_less_bias(self):
+        return self._theta[1:, :]
 
     def update_theta(self):
         pass
@@ -73,6 +74,7 @@ class NeuralNet:
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes, output_data=output_data)]
         self._input_data = input_data
         self._lambda = 1
+        self.cost = 0
         self._output_data = output_data
         self.stack = Stack()
 
@@ -96,12 +98,11 @@ class NeuralNet:
         self._layers[layer].next_step(self._layers[layer-1].nodes if layer > 0 else self._input_data)
 
     def back_prop_step(self, layer):
-        print("BBB")
-        print(layer)
-        print(self.size)
-        print(self._output_data)
-        print("AAA")
-        self._layers[layer].calc_error(self._output_data if layer == self.size-1 else self._layers[layer+1].error)
+        self._layers[layer].calc_error(self._output_data if layer == self.size-1 else self._layers[layer+1].error,
+                                       False if layer == self.size - 1 else self.layers[layer+1].theta)
+
+    def amend_theta(self, layer, i, j, epsilon):
+        self._layers[layer].amend_theta(i, j, epsilon)
 
     @property
     def size(self):

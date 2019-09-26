@@ -35,10 +35,7 @@ class BackwardProp(Procedure):
         super().__init__(neural_net)
 
     def step(self, action):
-        print("AAA")
-        print(self.neural_net.size-1)
         for i in range(self.neural_net.size-1, 0, -1):
-            print(i)
             self.neural_net.back_prop_step(i)
 
 
@@ -47,16 +44,13 @@ class Cost(Procedure):
         super().__init__(neural_net)
 
     def step(self, action):
-        # TODO:  Get this cost function as the output from the last layer and the nodes from the second last?
-        value = np.multiply(self.neural_net.output_data, np.log(self.neural_net.layers[-2].nodes)) + \
-                np.multiply(1-self.neural_net.output_data, np.log(1-self.neural_net.layers[-2].nodes))
+        value = np.multiply(self.neural_net.output_data, np.log(self.neural_net.layers[-1].nodes)) + \
+            np.multiply(1-self.neural_net.output_data, np.log(1-self.neural_net.layers[-1].nodes))
         regression = 0
         for i in range(self.neural_net.size-1):
             regression = self.neural_net.lambd / (2 * np.size(value, 0)) * \
                          np.sum(np.square(self.neural_net.layers[i].theta))
-        print(-np.sum(value) / np.size(value, 0) + regression)
-        print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-        print(self.neural_net.layers[-2].theta)
+        self.neural_net.cost = -np.sum(value) / np.size(value, 0) + regression
 
 
 class BackProp(Procedure):
