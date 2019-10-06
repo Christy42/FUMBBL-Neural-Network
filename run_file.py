@@ -19,18 +19,18 @@ N.set_layer(2, Theta_2)
 # N.set_layer(3, Theta_3)
 # Add Roll Forward to the Stack
 
-# final = Cost(N)
-# back_prop = BackwardProp(N)
-# roll_forward = ForwardProp(N)
+#final = Cost(N)
+#back_prop = BackwardProp(N)
+#roll_forward = ForwardProp(N)
 
 
 # Run through the stack - this functionality needs some work
-# N.step()
+N.step()
 numeric(N, 0.001)
 
-#print(N.layers[-2].nodes)
-#for i in range(N.size):
-#   print(i)
-#   print(N.layers[i].nodes)
-#   print(N.layers[i].theta)
+# print(N.layers[-2].nodes)
+# for i in range(N.size):
+#    print(i)
+#    print(N.layers[i].nodes)
+#    print(N.layers[i].theta)
 

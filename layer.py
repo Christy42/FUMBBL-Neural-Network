@@ -1,8 +1,7 @@
 import numpy as np
 
 from enum_values import LayerTypes
-from forward_prop import sigmoid
-from add_bias import add_bias
+from utility import sigmoid, add_bias
 from stack import Stack
 
 
@@ -16,6 +15,7 @@ class Layer:
         self._input_bias = np.matrix([[]])
         self._error = np.matrix([0] * self._no_nodes)
         self._delta = self._error
+        self._z_val = False
         self._theta = np.matrix([[]]) if style == LayerTypes.INPUT else self._initialise_matrix(0.01)
 
     @property
@@ -23,25 +23,40 @@ class Layer:
         return self._nodes
 
     @property
+    def input_bias(self):
+        return self._input_bias
+
+    @property
     def error(self):
         return self._error
 
     def calc_error(self, data, follow_theta=False):
         if self._style == LayerTypes.OUTPUT:
-            self._error = self._nodes - data
+            self._delta = self._nodes - data
         else:
-            print(data * np.transpose(follow_theta))
-            print(self._input_bias)
-            self._delta = np.multiply(data * np.transpose(follow_theta), np.multiply(self._input_bias, 1 - self._input_bias))
-        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        print(self._delta)
+
+            self._delta = np.multiply(data * np.transpose(follow_theta)[:, 1:],
+                                      np.multiply(sigmoid(self._z_val), 1 - sigmoid(self._z_val)))
 
     def update(self):
         self._theta += self._error
 
+    def calc_error_term(self, prev_nodes, lambd):
+        self._error = np.transpose(self._delta) * prev_nodes / np.size(self._nodes, 0)
+
+        theta_less_bias = np.concatenate((np.zeros(np.size(np.transpose(self._theta)[:, 1:], 0))[:, np.newaxis], np.transpose(self._theta)[:, 1:]), axis=1)
+
+        self._error += lambd * theta_less_bias / np.size(self._nodes, 0)
+        print("errr")
+        print(self._error)
+
     @property
     def theta(self):
         return self._theta
+
+    @property
+    def delta(self):
+        return self._delta
 
     def amend_theta(self, i, j, epsilon):
         self._theta[i, j] += epsilon
@@ -51,7 +66,8 @@ class Layer:
 
     def next_step(self, x):
         self._input_bias = add_bias(x)
-        self._nodes = sigmoid(self._input_bias * self._theta)
+        self._z_val = self.input_bias * self._theta
+        self._nodes = sigmoid(self._z_val)
 
     @property
     def theta_less_bias(self):
@@ -78,6 +94,9 @@ class NeuralNet:
         self._output_data = output_data
         self.stack = Stack()
 
+    def calculate_deltas(self, layer):
+        self.layers[layer].calc_error_term(add_bias(self.layers[layer-1].nodes), self._lambda)
+
     @property
     def layers(self):
         return self._layers
@@ -98,7 +117,7 @@ class NeuralNet:
         self._layers[layer].next_step(self._layers[layer-1].nodes if layer > 0 else self._input_data)
 
     def back_prop_step(self, layer):
-        self._layers[layer].calc_error(self._output_data if layer == self.size-1 else self._layers[layer+1].error,
+        self._layers[layer].calc_error(self._output_data if layer == self.size-1 else self._layers[layer+1].delta,
                                        False if layer == self.size - 1 else self.layers[layer+1].theta)
 
     def amend_theta(self, layer, i, j, epsilon):

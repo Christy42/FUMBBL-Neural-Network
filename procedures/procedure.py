@@ -37,6 +37,8 @@ class BackwardProp(Procedure):
     def step(self, action):
         for i in range(self.neural_net.size-1, 0, -1):
             self.neural_net.back_prop_step(i)
+        for i in range(self.neural_net.size - 1, 0, -1):
+            self.neural_net.calculate_deltas(i)
 
 
 class Cost(Procedure):
@@ -44,18 +46,10 @@ class Cost(Procedure):
         super().__init__(neural_net)
 
     def step(self, action):
-        value = np.multiply(self.neural_net.output_data, np.log(self.neural_net.layers[-1].nodes)) + \
-            np.multiply(1-self.neural_net.output_data, np.log(1-self.neural_net.layers[-1].nodes))
+        value = np.trace(np.transpose(self.neural_net.output_data) * np.log(self.neural_net.layers[-1].nodes)) + \
+            np.trace(np.transpose(1-self.neural_net.output_data) * np.log(1-self.neural_net.layers[-1].nodes))
         regression = 0
-        for i in range(self.neural_net.size-1):
-            regression = self.neural_net.lambd / (2 * np.size(value, 0)) * \
-                         np.sum(np.square(self.neural_net.layers[i].theta))
-        self.neural_net.cost = -np.sum(value) / np.size(value, 0) + regression
+        for i in range(self.neural_net.size):
+            regression += np.sum(np.square(self.neural_net.layers[i].theta[1:, :]))
 
-
-class BackProp(Procedure):
-    def __init__(self, neural_net):
-        super().__init__(neural_net)
-
-    def step(self, action):
-        pass
+        self.neural_net.cost = -np.sum(value) / np.size(self.neural_net.output_data, 0) + self.neural_net.lambd / (2 * np.size(self.neural_net.output_data, 0)) * regression
