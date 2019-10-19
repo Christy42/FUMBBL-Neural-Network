@@ -19,4 +19,4 @@ def numeric(neural_net, epsilon):
                 ForwardProp(new_net)
                 new_net.step()
                 c_2 = new_net.cost
-                print((i, j, k, c_1, c_2, (c_1 - c_2) / 2 * epsilon))
+                print((i, j, k, c_1, c_2, (c_1 - c_2) / (2 * epsilon)))

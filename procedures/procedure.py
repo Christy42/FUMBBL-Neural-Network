@@ -53,3 +53,18 @@ class Cost(Procedure):
             regression += np.sum(np.square(self.neural_net.layers[i].theta[1:, :]))
 
         self.neural_net.cost = -np.sum(value) / np.size(self.neural_net.output_data, 0) + self.neural_net.lambd / (2 * np.size(self.neural_net.output_data, 0)) * regression
+
+
+class NetRun(Procedure):
+    def __init__(self, neural_net):
+        super().__init__(neural_net)
+
+    def step(self, action):
+        NetRun(self.neural_net)
+        Cost(self.neural_net)
+        BackwardProp(self.neural_net)
+        ForwardProp(self.neural_net)
+        print("cost")
+        print(self.neural_net.cost)
+        if self.neural_net.cost < 1:
+            self.neural_net.empty()

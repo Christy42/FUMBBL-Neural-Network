@@ -8,6 +8,9 @@ class Stack:
     def is_empty(self):
         return self.items == []
 
+    def empty(self):
+        self.items = []
+
     def push(self, item):
         self.items.append(item)
 

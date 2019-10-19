@@ -2,7 +2,7 @@ import numpy as np
 
 from layer import NeuralNet
 from numerical_check import numeric
-from procedures.procedure import ForwardProp, BackwardProp, Cost
+from procedures.procedure import ForwardProp, BackwardProp, Cost, NetRun
 # Create data
 X = np.matrix([[0.5403, -0.4161], [-0.99, -0.6536], [0.2837, 0.9602]])
 # Create Neural Net
@@ -19,18 +19,17 @@ N.set_layer(2, Theta_2)
 # N.set_layer(3, Theta_3)
 # Add Roll Forward to the Stack
 
-#final = Cost(N)
-#back_prop = BackwardProp(N)
-#roll_forward = ForwardProp(N)
+# final = Cost(N)
+# back_prop = BackwardProp(N)
+# roll_forward = ForwardProp(N)
+NetRun(N)
 
-
-# Run through the stack - this functionality needs some work
+# Run through the stack - Just need to run it on a loop
 N.step()
-numeric(N, 0.001)
+# numeric(N, 0.0001)
 
 # print(N.layers[-2].nodes)
 # for i in range(N.size):
 #    print(i)
 #    print(N.layers[i].nodes)
 #    print(N.layers[i].theta)
-

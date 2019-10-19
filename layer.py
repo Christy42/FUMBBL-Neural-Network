@@ -34,7 +34,6 @@ class Layer:
         if self._style == LayerTypes.OUTPUT:
             self._delta = self._nodes - data
         else:
-
             self._delta = np.multiply(data * np.transpose(follow_theta)[:, 1:],
                                       np.multiply(sigmoid(self._z_val), 1 - sigmoid(self._z_val)))
 
@@ -47,8 +46,6 @@ class Layer:
         theta_less_bias = np.concatenate((np.zeros(np.size(np.transpose(self._theta)[:, 1:], 0))[:, np.newaxis], np.transpose(self._theta)[:, 1:]), axis=1)
 
         self._error += lambd * theta_less_bias / np.size(self._nodes, 0)
-        print("errr")
-        print(self._error)
 
     @property
     def theta(self):
@@ -90,7 +87,7 @@ class NeuralNet:
                        [Layer(output_nodes, LayerTypes.OUTPUT, hidden_nodes, output_data=output_data)]
         self._input_data = input_data
         self._lambda = 1
-        self.cost = 0
+        self.cost = 1000
         self._output_data = output_data
         self.stack = Stack()
 
@@ -119,6 +116,7 @@ class NeuralNet:
     def back_prop_step(self, layer):
         self._layers[layer].calc_error(self._output_data if layer == self.size-1 else self._layers[layer+1].delta,
                                        False if layer == self.size - 1 else self.layers[layer+1].theta)
+        self.layers[layer].update()
 
     def amend_theta(self, layer, i, j, epsilon):
         self._layers[layer].amend_theta(i, j, epsilon)
