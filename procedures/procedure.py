@@ -39,6 +39,8 @@ class BackwardProp(Procedure):
             self.neural_net.back_prop_step(i)
         for i in range(self.neural_net.size - 1, 0, -1):
             self.neural_net.calculate_deltas(i)
+        for i in range(self.neural_net.size - 1, 0, -1):
+            self.neural_net.update_layer(i)
 
 
 class Cost(Procedure):
@@ -66,5 +68,8 @@ class NetRun(Procedure):
         ForwardProp(self.neural_net)
         print("cost")
         print(self.neural_net.cost)
-        if self.neural_net.cost < 1:
-            self.neural_net.empty()
+        if self.neural_net.cost < 1 or self.neural_net.count > 10000:
+            self.neural_net.stack.empty()
+            for i in range(self.neural_net.size):
+                print(self.neural_net.layers[i].theta)
+        self.neural_net.count += 1

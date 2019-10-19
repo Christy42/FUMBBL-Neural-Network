@@ -37,8 +37,8 @@ class Layer:
             self._delta = np.multiply(data * np.transpose(follow_theta)[:, 1:],
                                       np.multiply(sigmoid(self._z_val), 1 - sigmoid(self._z_val)))
 
-    def update(self):
-        self._theta += self._error
+    def update(self, error):
+        self._theta -= np.transpose(error)
 
     def calc_error_term(self, prev_nodes, lambd):
         self._error = np.transpose(self._delta) * prev_nodes / np.size(self._nodes, 0)
@@ -88,11 +88,15 @@ class NeuralNet:
         self._input_data = input_data
         self._lambda = 1
         self.cost = 1000
+        self.count = 0
         self._output_data = output_data
         self.stack = Stack()
 
     def calculate_deltas(self, layer):
         self.layers[layer].calc_error_term(add_bias(self.layers[layer-1].nodes), self._lambda)
+
+    def update_layer(self, layer):
+        self.layers[layer].update(self.layers[layer].error)
 
     @property
     def layers(self):
@@ -116,7 +120,6 @@ class NeuralNet:
     def back_prop_step(self, layer):
         self._layers[layer].calc_error(self._output_data if layer == self.size-1 else self._layers[layer+1].delta,
                                        False if layer == self.size - 1 else self.layers[layer+1].theta)
-        self.layers[layer].update()
 
     def amend_theta(self, layer, i, j, epsilon):
         self._layers[layer].amend_theta(i, j, epsilon)
